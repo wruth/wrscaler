@@ -1,0 +1,49 @@
+#example-wrapper {
+    padding: 20px;
+    background-color: #ddd;
+}
+
+#example {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    background-color: #cc9;
+    transform-origin: top left;
+}
+
+.corner {
+    position: absolute;
+    width: 240px;
+    height: 240px;
+}
+
+.center {
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    left: 50%;
+    top: 50%;
+    margin-top: -160px;
+    margin-left: -160px;
+    background-color: #902;
+}
+
+.upper-left {
+    background-color: #ff9;
+}
+
+.upper-right {
+    right: 0;
+    background-color: #9f9;
+}
+
+.lower-right {
+    right: 0;
+    bottom: 0;
+    background-color: #99f;
+}
+
+.lower-left {
+    bottom: 0;
+    background-color: #f9f;
+}

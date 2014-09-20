@@ -1,1 +1,5 @@
-console.log('This would be the main JS file.');
+(function ($) {
+
+    $('#example').wrscaler({ threshold: 660 });
+
+}(jQuery));
