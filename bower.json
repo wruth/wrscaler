@@ -1,0 +1,31 @@
+{
+  "name": "wrscaler",
+  "version": "0.1.0-alpha",
+  "homepage": "https://github.com/wruth/wrscaler",
+  "authors": [
+    "Ward Ruth <ward.ruth@gmail.com>"
+  ],
+  "description": "jQuery plugin that applies a CSS3 scale transform to an element to resize it below a specified window breakpoint width.",
+  "main": "dist/jquery.wrscaler.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "jquery",
+    "plugin",
+    "transform",
+    "scale"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "src",
+    "libs"
+  ],
+  "dependencies": {
+    "jquery": ">=1.8.0"
+  }
+}
