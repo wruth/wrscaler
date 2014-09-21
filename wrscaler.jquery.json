@@ -2,7 +2,7 @@
   "name": "wrscaler",
   "title": "WRScaler",
   "description": "A jQuery plugin that applies a CSS3 scale transform to an element to resize it below a specified window breakpoint width.",
-  "version": "0.1.0-alpha",
+  "version": "0.2.0-alpha",
   "homepage": "https://github.com/wruth/wrscaler",
   "demo": "http://wruth.github.io/wrscaler/ ",
   "author": {

@@ -112,14 +112,20 @@ And some CSS:
 ### Configuration
 An options argument Object can be provided when invoking wrscaler. There is one required and two optional properties:
 
-* `threshold`: **Required.** A numeric value representing essentially the breakpoint below which scaling should be applied.
+* `threshold`: **Required.** A numeric value representing essentially the breakpoint below which scaling should be applied. Similar to a value that could be used in a CSS breakpoint, but it's important to note that it can be subtly different as it is understood to always correspond to `$(window).width()`, and internally is itself dynamically adjusted based on whether there is a vertical scrollbar to create a `MediaQueryList` object and corresponding listener. Therefore any breakpoint related changes that are necessary are probably best handled in response to the `changeCallback` (detailed below) as opposed to a CSS media query breakpoint.
 * `isVScaleParent`: A Boolean value indicating whether WRScaler should automatically adjust the height of the element's parent element to follow the scaled height. Default is `true`.
-* `changeCallback`: A callback function which will be invoked when the window width falls below the threshold value, whenever the window resizes below the threshold value, and when the window width exceeds the threshold value. A parameter Object is provided as the sole argument of the callback with the following properties:
- * `type`: One of three String values, `'transform-start'`, `'transform-change'`,  or `'transform-end'`.
- * `scale`: A scale value, something less than one and greater than zero.
- * `resizedTargetWidth`: The pixel width the element is being scaled to fit.
- * `windowWidth`: For convenience, this is the same value as `$(window).width()`.
-
+* `changeCallback`: A callback function which will be invoked when the window width falls below the threshold value, whenever the window resizes below the threshold value, and when the window width exceeds the threshold value. A parameter Object is provided as the sole argument of the callback.
+ 
+### Change Callback
+As noted the `changeCallback` will be invoked in three different conditions. A parameter object is always supplied as the sole argument to the callback, and has a `type` property reflecting the condition under which it is being invoked. These conditions (and the correspondng `type` value) are:
+ 
+ 1. `transform-will-start`: Invoked just before a scale transform is applied to the element, and if the threshold condition has been satisfied immediately, before the element is measured by the scaler. This gives client code a chance to adjust the properties of the scaled element if necessary before it is measured and scaled. For instance you might want to change the positioning of the element to `absolute`.
+ 2. `transform-change`: Invoked whenever the scale transform is in scope in response to a window resize event, and immediately after a `transform-will-start` notification. This form of the callback adds some additional properties to the parameter object:
+ 	* `scale`: A scale value, something less than one and greater than zero.
+ 	* `resizedTargetWidth`: The pixel width the element is being scaled to fit.
+ 	* `windowWidth`: For convenience, this is the same value as `$(window).width()`.
+ 3. `transform-end`: Invoked when the window width exceeds the threshold value.
+ 	
 ## Dependencies
 * jQuery >=1.8.0
 * `window.matchMedia`, `MediaQueryList`

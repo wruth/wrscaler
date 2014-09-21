@@ -92,14 +92,17 @@
      */
     function _init (settings) {
 
-        var transform = this.$el.css('transform'),
-            _this = this;
+        var transform = this.$el.css('transform');
 
         this.baseTransform = transform;
         this.matrix = _getMatrixFromString(transform);
 
         this.$window = $(window);
         this.threshold = settings.threshold;
+        this.changeCallback = settings.changeCallback;
+
+        _initMediaQuery.call(this, settings.threshold);
+
 
         //
         // the width of the element to be scaled. Don't measure the margin
@@ -112,7 +115,7 @@
         // width of what is *not* being scaled, assumed to be invariant
         //
         this.targetDelta = this.threshold - this.targetWidth;
-        this.changeCallback = settings.changeCallback;
+
 
         if (settings.isVScaleParent) {
             this.$parent = this.$el.parent();
@@ -123,9 +126,13 @@
         // make my own proxy because I don't want to pass the resize event
         // object through
         //
-        this.resizeProxy = function () { _resize.call(_this); };
+        this.resizeProxy = $.proxy(_resize, this);
 
-        _initMediaQuery.call(this, settings.threshold);
+        //
+        // need to explicitly check first, because the media query condition
+        // may already be satisfied
+        //
+        this.mqlListenerProxy(this.mql);
     }
 
     /**
@@ -155,13 +162,21 @@
         this.mqlListenerProxy = $.proxy(_mqlListener, this);
         this.mql.addListener(this.mqlListenerProxy);
 
-        this.isMqlMatched = false;
+        //
+        // this flag protects against a possible double 'transform-will-start'
+        // callback notification when the scaler is first initialized
+        //
+        this.isInitialStart = false;
 
         //
-        // need to explicitly check first, because the media query condition
-        // may already be satisfied
+        // do initial check here so the client can make any necessary layout
+        // changes prior to the scaler doing an initial measurement of the
+        // element to scale.
         //
-        this.mqlListenerProxy(this.mql);
+        if (this.mql.matches) {
+            this.changeCallback({type: 'transform-will-start'});
+            this.isInitialStart = true;
+        }
     }
 
     /**
@@ -208,16 +223,22 @@
     function _mqlListener (mql) {
 
         if (mql.matches) {
+
+            if (!this.isInitialStart) {
+                this.changeCallback({type: 'transform-will-start'});
+            }
+            else {
+                this.isInitialStart = false;
+            }
+
             this.$window.on('resize' + ns, this.resizeProxy);
 
-            _resize.call(this, !this.isMqlMatched);
-            this.isMqlMatched = true;
+            _resize.call(this);
         }
         else {
             this.$window.off('resize' + ns, this.resizeProxy);
             _reset.call(this);
             this.changeCallback({type: 'transform-end'});
-            this.isMqlMatched = false;
         }
     }
 
@@ -238,7 +259,7 @@
      *                           is a successive resize due to the window
      *                           resizing.
      */
-    function _resize (isStart) {
+    function _resize () {
 
         var width = this.$window.width(),
             //
@@ -250,7 +271,7 @@
             resizedTargetWidth = width - this.targetDelta,
             scale = resizedTargetWidth / this.targetWidth,
             callbackObj = {
-                type: isStart ? 'transform-start' : 'transform-change',
+                type: 'transform-change',
                 scale: scale,
                 resizedTargetWidth: resizedTargetWidth,
                 windowWidth: width
@@ -328,7 +349,7 @@
          * Callback invoked when a scale transform changes.
          * @param  {Object} changeObj Change object with the following form:
          * @property {String} type Type can have one of three values:
-         *                         'transform-start' - when the mediaQuery
+         *                         'transform-will-start' - when the mediaQuery
          *                         condition is satisfied and the transform is
          *                         first applied.
          *                         'transform-change' - the transform has
