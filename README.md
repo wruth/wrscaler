@@ -62,7 +62,11 @@ And some CSS:
     width: 600px;
     height: 600px;
     background-color: #cc9;
-    transform-origin: top left;
+    -webkit-transform-origin: 0 0;
+    -moz-transform-origin: 0 0;
+    -ms-transform-origin: 0 0;
+    -o-transform-origin: 0 0;
+    transform-origin: 0 0;
 }
 
 .corner {
